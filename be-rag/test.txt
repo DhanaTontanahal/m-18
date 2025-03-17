@@ -1,0 +1,82 @@
+uvicorn app:app --reload
+
+
+use menu_logger;
+
+select * from users;
+
+
+ CREATE USER 'root'@'172.17.0.1' IDENTIFIED BY 'yourpassword'; 
+ 
+
+
+
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+SELECT user, host FROM mysql.user;
+
+
+ALTER USER 'root'@'%' IDENTIFIED BY 'yourpassword';
+FLUSH PRIVILEGES;
+
+
+docker build -t fastapi-app .
+
+docker run -p 8080:8080 fastapi-app
+
+gcloud auth login
+gcloud config set project <YOUR_PROJECT_ID>
+
+
+docker tag fastapi-app gcr.io/voltaic-battery-447511-p5/fastapi-app
+
+docker push gcr.io/voltaic-battery-447511-p5/fastapi-app
+
+
+gcloud run deploy fastapi-app --image gcr.io/voltaic-battery-447511-p5/fastapi-app --platform=managed --region us-central1 --allow-unauthenticated
+
+================================================I WANTED TO CREATE ANOTHER INSTANCE =======JAN 31==================================
+
+
+docker build -t fastapi-app1 .
+
+docker run -p 8080:8080 fastapi-app1
+
+gcloud auth login
+gcloud config set project voltaic-battery-447511-p5
+
+
+docker tag fastapi-app gcr.io/voltaic-battery-447511-p5/fastapi-app1
+
+docker push gcr.io/voltaic-battery-447511-p5/fastapi-app1
+
+
+gcloud run deploy fastapi-app1 --image gcr.io/voltaic-battery-447511-p5/fastapi-app1 --platform=managed --region us-central1 --allow-unauthenticated
+
+
+==============================Feb 3=================
+================updated knowledge base=======================
+
+Just checked till app3 already in Deploy FE app folder
+this is latest UI as we upated many things and deployed the FE to cloud
+So now it will be app4
+=========================================================
+also update this in 2 places in mjs file and Main.jsx and redeploy FE app
+==========================================================
+docker build -t fastapi-app4 .
+
+docker run -p 8080:8080 fastapi-app4
+
+gcloud auth login
+gcloud config set project voltaic-battery-447511-p5
+
+
+docker tag fastapi-app gcr.io/voltaic-battery-447511-p5/fastapi-app4
+
+docker push gcr.io/voltaic-battery-447511-p5/fastapi-app4
+
+
+gcloud run deploy fastapi-app4 --image gcr.io/voltaic-battery-447511-p5/fastapi-app4 --platform=managed --region us-central1 --allow-unauthenticated

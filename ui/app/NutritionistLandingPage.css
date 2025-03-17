@@ -1,0 +1,247 @@
+/* Global Container */
+.finance-container {
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    color: #2c3e50;
+    background-color: #f5f7fa;
+    text-align: center;
+    padding: 20px;
+    /* Added some padding */
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    padding: 70px 20px;
+    border-radius: 15px;
+    /* Rounded corners for modern look */
+    margin-bottom: 30px;
+    /* Spacing */
+}
+
+.hero-title {
+    font-size: 38px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    margin-bottom: 25px;
+    opacity: 0.9;
+}
+
+.hero-button {
+    background-color: #f39c12;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    /* More rounded button */
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+}
+
+.hero-button:hover {
+    background-color: #e67e22;
+}
+
+/* Features Section */
+.features-section {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    /* Increased gap for spacing */
+    flex-wrap: wrap;
+    padding: 50px 20px;
+}
+
+.feature-card {
+    background: white;
+    padding: 30px;
+    /* Increased padding */
+    border-radius: 12px;
+    /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Stronger shadow */
+    width: 280px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    /* Hover effect */
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-title {
+    font-size: 22px;
+    /* Slightly larger title */
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    /* Added margin */
+}
+
+.feature-description {
+    color: #7f8c8d;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+/* Finance Tips Section */
+.finance-tips-section {
+    background-color: #ffffff;
+    padding: 50px 30px;
+    /* Adjusted padding */
+    border-radius: 12px;
+    /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Stronger shadow */
+    max-width: 800px;
+    margin: 30px auto;
+    text-align: left;
+}
+
+.tips-title {
+    font-size: 28px;
+    /* Larger title */
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 20px;
+    /* Added margin */
+    text-align: center;
+}
+
+.tips-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tips-list li {
+    font-size: 17px;
+    /* Slightly larger text */
+    color: #2c3e50;
+    margin-bottom: 12px;
+    /* Added margin */
+    padding: 15px;
+    /* Increased padding */
+    border-left: 6px solid #3498db;
+    /* Thicker border */
+    background: #ecf0f1;
+    border-radius: 8px;
+    /* Rounded corners */
+}
+
+.tips-list li strong {
+    color: #2980b9;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+    background-color: #ecf0f1;
+    padding: 50px 20px;
+    border-radius: 15px;
+    /* Consistent rounded corners */
+    margin-bottom: 30px;
+    /* Spacing */
+}
+
+.testimonials-title {
+    font-size: 28px;
+    /* Larger title */
+    font-weight: bold;
+    color: #34495e;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.testimonials-text {
+    font-size: 17px;
+    /* Slightly larger text */
+    color: #7f8c8d;
+    max-width: 700px;
+    /* Wider text area */
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Contact Section */
+.contact-section {
+    padding: 50px 20px;
+}
+
+.contact-title {
+    font-size: 28px;
+    /* Larger title */
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.contact-subtitle {
+    font-size: 17px;
+    /* Slightly larger text */
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    /* Increased margin */
+}
+
+.contact-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    /* Increased gap */
+    flex-wrap: wrap;
+}
+
+.contact-button {
+    background: #3498db;
+    padding: 14px 28px;
+    /* Adjusted padding */
+    border-radius: 8px;
+    /* Rounded corners */
+    color: white;
+    font-size: 17px;
+    /* Slightly larger text */
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    /* Added transform */
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+}
+
+.contact-button:hover {
+    background: #2980b9;
+    transform: scale(1.05);
+    /* Slight scale on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .features-section {
+        gap: 15px;
+    }
+
+    .feature-card {
+        width: 100%;
+        /* Full width on smaller screens */
+    }
+
+    .contact-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
