@@ -1,0 +1,217 @@
+import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
+import { FaThumbsUp, FaThumbsDown, FaPlayCircle } from "react-icons/fa";
+
+const ChatResponse = ({ message, videoLink, isAssistant }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const [audioSrc, setAudioSrc] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audio = new Audio();
+
+  if (!message && !videoLink) return null;
+
+  // Function to generate speech
+  const generateSpeech = async (text) => {
+    try {
+      const response = await fetch("http://localhost:8000/generate-audio/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await response.json();
+      setAudioSrc(data.audio_url);
+      audio.src = data.audio_url;
+      audio.play();
+      setIsPlaying(true);
+      audio.onended = () => setIsPlaying(false);
+    } catch (error) {
+      console.error("Error generating speech:", error);
+    }
+  };
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-100 rounded-md p-4"
+      >
+        {message && (
+          <ReactMarkdown className="text-gray-800 leading-relaxed">
+            {message}
+          </ReactMarkdown>
+        )}
+
+        {/* Animated Waves When Audio is Playing */}
+        {isPlaying && (
+          <motion.div
+            className="wave-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="wave"></div>
+            <div className="wave"></div>
+            <div className="wave"></div>
+          </motion.div>
+        )}
+
+        {/* Feedback Section */}
+        {isAssistant && (
+          <div className="feedback-section">
+            <motion.div
+              className="play-button-wrapper"
+              whileTap={{ scale: 0.9 }}
+              animate={isPlaying ? { scale: [1, 1.2, 1] } : {}}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            >
+              <motion.div
+                className="play-button-glow"
+                animate={isPlaying ? { scale: [1, 1.3, 1] } : {}}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                }}
+              >
+                <FaPlayCircle
+                  className={`play-icon ${isPlaying ? "active" : ""}`}
+                  onClick={() => generateSpeech(message)}
+                />
+              </motion.div>
+            </motion.div>
+            <span>Was this helpful?</span>
+            <FaThumbsUp
+              className={`feedback-icon ${feedback === "like" ? "active" : ""}`}
+              onClick={() => setFeedback("like")}
+            />
+            <FaThumbsDown
+              className={`feedback-icon ${
+                feedback === "dislike" ? "active" : ""
+              }`}
+              onClick={() => setFeedback("dislike")}
+            />
+          </div>
+        )}
+      </motion.div>
+
+      <style jsx>{`
+        .feedback-section {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding-top: 8px;
+          font-size: 14px;
+          color: #666;
+          margin-top: 10px;
+        }
+
+        .play-button-wrapper {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 50px;
+          height: 50px;
+        }
+
+        .play-button-glow {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          box-shadow: 0 0 15px rgba(0, 123, 255, 0.6);
+          transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .play-icon {
+          font-size: 32px;
+          cursor: pointer;
+          color: #007bff;
+          transition: color 0.2s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .play-icon.active {
+          color: #28a745; /* Green when playing */
+          animation: pulse 1.5s infinite;
+        }
+
+        .feedback-icon {
+          font-size: 18px;
+          cursor: pointer;
+          color: #999;
+          transition: color 0.2s ease-in-out;
+        }
+
+        .feedback-icon:hover {
+          color: #000;
+        }
+
+        .feedback-icon.active {
+          color: #007bff; /* Highlight selected feedback */
+        }
+
+        /* Waves Animation */
+        .wave-container {
+          display: flex;
+          justify-content: center;
+          gap: 5px;
+          margin-top: 10px;
+          height: 10px;
+        }
+
+        .wave {
+          width: 6px;
+          height: 10px;
+          background-color: #007bff;
+          border-radius: 10px;
+          animation: waveAnimation 1.2s infinite ease-in-out;
+        }
+
+        .wave:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        .wave:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+
+        @keyframes waveAnimation {
+          0% {
+            height: 10px;
+          }
+          50% {
+            height: 25px;
+          }
+          100% {
+            height: 10px;
+          }
+        }
+
+        /* Play Button Click Effect */
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+      `}</style>
+    </>
+  );
+};
+
+export default ChatResponse;

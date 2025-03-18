@@ -1,0 +1,162 @@
+import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
+import { FaThumbsUp, FaThumbsDown, FaPlayCircle } from "react-icons/fa";
+
+const ChatResponse = ({ message, videoLink, isAssistant }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const [audioSrc, setAudioSrc] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audio = new Audio();
+
+  if (!message && !videoLink) return null;
+
+  // Convert YouTube URL into an Embed URL
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const regExp =
+      /(?:youtube\.com\/(?:.*v=|.*\/|.*embed\/)|youtu.be\/)([^"&?\/\s]+)/;
+    const match = url.match(regExp);
+    const videoId = match ? match[1] : null;
+    return videoId
+      ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
+      : null;
+  };
+
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(videoLink);
+
+  // Function to generate speech
+  const generateSpeech = async (text) => {
+    try {
+      const response = await fetch("http://localhost:8000/generate-audio/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await response.json();
+      setAudioSrc(data.audio_url);
+      audio.src = data.audio_url;
+      audio.play();
+      setIsPlaying(true);
+      audio.onended = () => setIsPlaying(false);
+    } catch (error) {
+      console.error("Error generating speech:", error);
+    }
+  };
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-100 rounded-md"
+      >
+        {message && (
+          <ReactMarkdown className="text-gray-800 leading-relaxed">
+            {message}
+          </ReactMarkdown>
+        )}
+
+        {/* Feedback Section */}
+        {isAssistant && (
+          <div className="feedback-section">
+            <motion.div
+              className="play-button-wrapper"
+              animate={isPlaying ? { scale: [1, 1.2, 1] } : {}}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            >
+              <motion.div
+                animate={isPlaying ? { rotate: 360 } : {}}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <FaPlayCircle
+                  className={`play-icon ${isPlaying ? "active" : ""}`}
+                  onClick={() => generateSpeech(message)}
+                />
+              </motion.div>
+            </motion.div>
+            <span>Was this helpful?</span>
+            <FaThumbsUp
+              className={`feedback-icon ${feedback === "like" ? "active" : ""}`}
+              onClick={() => setFeedback("like")}
+            />
+            <FaThumbsDown
+              className={`feedback-icon ${
+                feedback === "dislike" ? "active" : ""
+              }`}
+              onClick={() => setFeedback("dislike")}
+            />
+          </div>
+        )}
+      </motion.div>
+
+      <style jsx>{`
+        .feedback-section {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding-top: 8px;
+          font-size: 14px;
+          color: #666;
+          margin-top: 10px;
+        }
+
+        .play-button-wrapper {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+        }
+
+        .play-icon {
+          font-size: 28px;
+          cursor: pointer;
+          color: #007bff;
+          transition: color 0.2s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .play-icon.active {
+          color: #28a745; /* Green when playing */
+          animation: pulse 1.5s infinite;
+        }
+
+        .feedback-icon {
+          font-size: 18px;
+          cursor: pointer;
+          color: #999;
+          transition: color 0.2s ease-in-out;
+        }
+
+        .feedback-icon:hover {
+          color: #000;
+        }
+
+        .feedback-icon.active {
+          color: #007bff; /* Highlight selected feedback */
+        }
+
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+      `}</style>
+    </>
+  );
+};
+
+export default ChatResponse;

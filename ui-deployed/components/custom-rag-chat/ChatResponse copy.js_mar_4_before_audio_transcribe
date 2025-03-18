@@ -1,0 +1,224 @@
+import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+
+const ChatResponse = ({ message, videoLink, isAssistant }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedback, setFeedback] = useState(null); // Stores user feedback (like/dislike)
+
+  if (!message && !videoLink) return null;
+
+  // Convert YouTube URL into an Embed URL
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const regExp =
+      /(?:youtube\.com\/(?:.*v=|.*\/|.*embed\/)|youtu.be\/)([^"&?\/\s]+)/;
+    const match = url.match(regExp);
+    const videoId = match ? match[1] : null;
+    return videoId
+      ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
+      : null;
+  };
+
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(videoLink);
+  const isYouTubeVideo = !!youtubeEmbedUrl;
+  const isDirectVideo = videoLink?.match(/\.(mp4|webm|ogg)$/);
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-100 rounded-md"
+      >
+        {message && (
+          <>
+            {(() => {
+              try {
+                const parsedMessage = JSON.parse(message);
+
+                return (
+                  <div>
+                    {/* Render the answer */}
+                    <ReactMarkdown className="text-gray-800 leading-relaxed">
+                      {parsedMessage.answer}
+                    </ReactMarkdown>
+
+                    {/* Render video if available */}
+                    {parsedMessage.videoLink && (
+                      <div className="mt-3">
+                        <iframe
+                          width="100%"
+                          height="250"
+                          src={parsedMessage.videoLink.replace(
+                            "watch?v=",
+                            "embed/"
+                          )}
+                          title="Video Response"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                    )}
+
+                    {parsedMessage.additionalHelp && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        {parsedMessage.additionalHelp}
+                      </p>
+                    )}
+                  </div>
+                );
+              } catch (e) {
+                return (
+                  <ReactMarkdown className="text-gray-800 leading-relaxed">
+                    {message}
+                  </ReactMarkdown>
+                );
+              }
+            })()}
+          </>
+        )}
+
+        {videoLink && (
+          <div
+            className="video-thumbnail mt-3"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsModalOpen(true);
+            }}
+            style={{ cursor: "pointer", position: "relative" }}
+          >
+            {isYouTubeVideo ? (
+              <img
+                src={`https://img.youtube.com/vi/${
+                  youtubeEmbedUrl.split("/embed/")[1].split("?")[0]
+                }/hqdefault.jpg`}
+                alt="Video Thumbnail"
+                width="100%"
+                height="200"
+                className="rounded-md shadow-md"
+              />
+            ) : (
+              <video width="100%" height="200" className="rounded-md shadow-md">
+                <source src={videoLink} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+            <div className="play-button-overlay">▶</div>
+          </div>
+        )}
+
+        {isAssistant && (
+          <div className="feedback-section">
+            <span>Was this helpful?</span>
+            <FaThumbsUp
+              className={`feedback-icon ${feedback === "like" ? "active" : ""}`}
+              onClick={() => setFeedback("like")}
+            />
+            <FaThumbsDown
+              className={`feedback-icon ${
+                feedback === "dislike" ? "active" : ""
+              }`}
+              onClick={() => setFeedback("dislike")}
+            />
+          </div>
+        )}
+      </motion.div>
+
+      {/* Video Modal Popup */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button */}
+            <span
+              className="close-button"
+              onClick={() => setIsModalOpen(false)}
+            >
+              ✖
+            </span>
+
+            {/* YouTube Video Embed */}
+            {isYouTubeVideo ? (
+              <iframe
+                width="100%"
+                height="400"
+                src={youtubeEmbedUrl}
+                title="Video Response"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              /* Direct Video Embed */
+              <video width="100%" height="400" controls autoPlay>
+                <source src={videoLink} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Styling */}
+      <style jsx>{`
+        .response-box {
+          background: #f3f3f3;
+          padding: 12px;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+        }
+
+        .response-text {
+          font-size: 16px;
+          color: #333;
+          line-height: 1.5;
+        }
+
+        .video-container {
+          margin-top: 10px;
+          cursor: pointer;
+        }
+
+        .video-thumbnail {
+          width: 100%;
+          border-radius: 6px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ✅ Feedback Section Inside Response */
+        .feedback-section {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding-top: 8px;
+          font-size: 14px;
+          color: #666;
+          margin-top: 10px;
+        }
+
+        .feedback-icon {
+          font-size: 18px;
+          cursor: pointer;
+          color: #999;
+          transition: color 0.2s ease-in-out;
+        }
+
+        .feedback-icon:hover {
+          color: #000;
+        }
+
+        .feedback-icon.active {
+          color: #007bff; /* Highlight selected feedback */
+        }
+      `}</style>
+    </>
+  );
+};
+
+export default ChatResponse;
